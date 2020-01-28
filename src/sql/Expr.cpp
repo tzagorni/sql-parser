@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "SelectStatement.h"
+#include "boost/functional/hash.hpp"
 
 namespace hsql {
 
@@ -222,6 +223,36 @@ Expr* Expr::makeExtract(DatetimeField datetimeField, Expr* expr) {
     e->datetimeField = datetimeField;
     e->expr = expr;
     return e;
+}
+
+uint64_t Expr::hash() {
+  if (isLiteral()) {
+    return 0;
+  }
+  auto hash = boost::hash_value(type);
+  if (expr != nullptr) {
+    boost::hash_combine(hash, expr->hash());
+  }
+  if (expr2 != nullptr) {
+    boost::hash_combine(hash, expr2->hash());
+  }
+  if (name) {
+    boost::hash_combine(hash, boost::hash_value(std::string(name)));
+  }
+  if (table) {
+    boost::hash_combine(hash, boost::hash_value(table));
+  }
+  if (alias) {
+    boost::hash_combine(hash, boost::hash_value(alias));
+  }
+  boost::hash_combine(hash, boost::hash_value(fval));
+  boost::hash_combine(hash, boost::hash_value(ival));
+  boost::hash_combine(hash, boost::hash_value(ival2));
+  boost::hash_combine(hash, boost::hash_value(datetimeField));
+  boost::hash_combine(hash, boost::hash_value(isBoolLiteral));
+  boost::hash_combine(hash, boost::hash_value(opType));
+  boost::hash_combine(hash, boost::hash_value(distinct));
+  return hash;
 }
 
 bool Expr::isType(ExprType exprType) const { return exprType == type; }

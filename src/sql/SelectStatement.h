@@ -4,6 +4,8 @@
 #include "SQLStatement.h"
 #include "Expr.h"
 #include "Table.h"
+#include "boost/functional/hash.hpp"
+
 
 namespace hsql {
   enum OrderType {
@@ -37,6 +39,14 @@ namespace hsql {
 
     std::vector<Expr*>* columns;
     Expr* having;
+
+    size_t hash() const {
+      auto hash = having->hash();
+      for (auto &x: *columns) {
+        boost::hash_combine(hash, x->hash());
+      }
+      return hash;
+    }
   };
 
   struct WithDescription {
@@ -62,6 +72,21 @@ namespace hsql {
     std::vector<OrderDescription*>* order;
     std::vector<WithDescription*>* withDescriptions;
     LimitDescription* limit;
+
+    size_t hash() const {
+      auto hash = boost::hash_value(std::string(fromTable->name));
+      boost::hash_combine(hash, selectDistinct);
+      boost::hash_combine(hash, whereClause->hash());
+      if (groupBy) {
+        boost::hash_combine(hash, groupBy->hash());
+      }
+      /*if (unionSelect) {
+        boost::hash_combine(hash, groupBy->hash());
+      }
+      for ()
+      if (WithDescriptions)*/
+      return hash;
+    }
   };
 
 

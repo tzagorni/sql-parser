@@ -173,6 +173,8 @@ struct Expr {
     static Expr* makeInOperator(Expr* expr, SelectStatement* select);
 
     static Expr* makeExtract(DatetimeField datetimeField1, Expr* expr);
+
+    uint64_t hash();
 };
 
 // Zero initializes an Expr object and assigns it to a space in the heap
