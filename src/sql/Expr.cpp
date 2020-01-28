@@ -4,6 +4,8 @@
 #include "SelectStatement.h"
 #include "boost/functional/hash.hpp"
 
+#include <iostream>
+
 namespace hsql {
 
 Expr::Expr(ExprType type)
@@ -223,6 +225,28 @@ Expr* Expr::makeExtract(DatetimeField datetimeField, Expr* expr) {
     e->datetimeField = datetimeField;
     e->expr = expr;
     return e;
+}
+
+void Expr::extractValues(std::vector<Expr>& result) {
+    if(isLiteral()) {
+        std::cout << "ES ist ein literal" << std::endl;
+        result.push_back(*this);
+        type = kExprParameter;
+        std::cout << "literal erfolgreich" << std::endl;
+
+        return;
+    }
+    std::cout << "ES ist kein literal" << std::endl;
+
+    if (expr != nullptr) {
+        expr->extractValues(result);
+    }
+    if (expr2 != nullptr) {
+        expr2->extractValues(result);
+    }
+    if (select != nullptr) {
+        select->extractValues(result);
+    }
 }
 
 uint64_t Expr::hash() {

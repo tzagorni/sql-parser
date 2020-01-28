@@ -175,6 +175,8 @@ struct Expr {
     static Expr* makeExtract(DatetimeField datetimeField1, Expr* expr);
 
     uint64_t hash();
+
+    void extractValues(std::vector<Expr>&);
 };
 
 // Zero initializes an Expr object and assigns it to a space in the heap
